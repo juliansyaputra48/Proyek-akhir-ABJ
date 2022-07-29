@@ -1,0 +1,170 @@
+-----------------------------------------------
+KONFIGURASI ADMIN
+-----------------------------------------------
+Switch>en
+Switch#conf t
+Switch(config)#hostname ADMIN
+
+MSW1(config)#int vlan 1
+MSW1(config-if)#ip address 192.168.45.2 255.255.255.0
+MSW1(config-if)#no shutdown
+MSW1(config-if)#exit
+MSW1(config)#ip default-gateway 192.168.45.1
+
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+MSW>en
+
+MASUK KE GLOBAL CONFIGURATION
+MSW#conf t
+
+MSW(config)#hostname MSW_KANTOR
+
+MENGATUR PASSWORD PRIVILEGE MODE
+MSW(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+MSW(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+MSW(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+MSW(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+MSW(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+MSW(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+MSW(config-line)#transport input ssh
+MSW(config-line)#exit
+MSW(config)#
+MSW1#copy run start
+
+-----------------------------------------------
+KONFIGURASI PEGAWAI
+-----------------------------------------------
+Switch>en
+Switch#conf t
+Switch(config)#hostname PEGAWAI
+
+MSW1(config)#int vlan 1
+MSW1(config-if)#ip address 192.168.46.2 255.255.255.0
+MSW1(config-if)#no shutdown
+MSW1(config-if)#exit
+MSW1(config)#ip default-gateway 192.168.46.1
+
+
+
+-----------------------------------------------
+KONFIGURASI PABRIK
+-----------------------------------------------
+Switch>en
+Switch#conf t
+Switch(config)#hostname PABRIK
+
+MSW1(config)#int vlan 1
+MSW1(config-if)#ip address 192.168.47.2 255.255.255.0
+MSW1(config-if)#no shutdown
+MSW1(config-if)#exit
+MSW1(config)#ip default-gateway 192.168.47.1
+
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+MSW>en
+
+MASUK KE GLOBAL CONFIGURATION
+MSW#conf t
+
+MSW(config)#hostname MSW_KANTOR
+
+MENGATUR PASSWORD PRIVILEGE MODE
+MSW(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+MSW(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+MSW(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+MSW(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+MSW(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+MSW(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+MSW(config-line)#transport input ssh
+MSW(config-line)#exit
+MSW(config)#
+
+-----------------------------------------------
+KONFIGURASI GUDANG
+-----------------------------------------------
+Switch>en
+Switch#conf t
+Switch(config)#hostname gudang
+
+MSW1(config)#int vlan 1
+MSW1(config-if)#ip address 192.168.48.2 255.255.255.0
+MSW1(config-if)#no shutdown
+MSW1(config-if)#exit
+MSW1(config)#ip default-gateway 192.168.48.1
+
+MSW_GUDANG(config)#vlan 10
+MSW_GUDANG(config-vlan)#name gudang
+MSW_GUDANG(config-vlan)#vlan 20
+MSW_GUDANG(config-vlan)#name distribusi
+MSW_GUDANG(config-vlan)#end
+MSW_GUDANG#show vlan brief
+
+MSW_GUDANG(config-if-range)#int range g1/0/2-5
+MSW_GUDANG(config-if-range)#switchport mode access 
+MSW_GUDANG(config-if-range)#switchport access vlan 10
+MSW_GUDANG(config-if-range)#int range g1/0/6-8
+MSW_GUDANG(config-if-range)#switchport mode access 
+MSW_GUDANG(config-if-range)#switchport access vlan 50
+MSW_GUDANG(config-if-range)#end
+MSW_GUDANG#show vlan brief
+
+MSW_GUDANG(config)#int g1/0/1
+MSW_GUDANG(config-if)#switchport mode trunk
+MSW_GUDANG(config-if)#end
+MSW_GUDANG#show int trunk
+
+
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+MSW>en
+
+MASUK KE GLOBAL CONFIGURATION
+MSW#conf t
+
+MSW(config)#hostname MSW_KANTOR
+
+MENGATUR PASSWORD PRIVILEGE MODE
+MSW(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+MSW(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+MSW(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+MSW(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+MSW(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+MSW(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+MSW(config-line)#transport input ssh
+MSW(config-line)#exit
+MSW(config)#
+

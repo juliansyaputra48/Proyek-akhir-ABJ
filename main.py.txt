@@ -1,0 +1,71 @@
+import requests
+from time import *
+import realhttp
+
+base_url = "http://192.168.45.254/api/v1"
+user = "usaha"
+password = "mandiri"
+
+bot_token = '5410443218:AAFR_ARSvgQJ8tQ9i1Y-TlWu_juh9teWGsI'
+bot_chatID = '-619718165'
+
+
+def get_ticket():
+	headers = {"content-type": "application/json"}
+	data = {"username" : user, "password": password}
+	
+	response = requests.post(base_url+"/ticket", headers=headers, json=data)
+	ticket = response.json()
+	service_ticket = ticket["response"]["serviceTicket"]
+	return service_ticket
+
+def get_network_health():
+    ticket = get_ticket()
+    headers = {"X-Auth-Token": ticket}
+    response = requests.get(base_url+"/assurance/health", headers=headers)
+    health = response.json()
+    network_health = health['response'][0]['networkDevices']['totalPercentage']
+    return network_health
+    
+def get_host():
+	ticket = get_ticket()
+	headers = {'Accept': 'application/yang-data+json',"X-Auth-Token": ticket}
+	response = requests.get(url = base_url+"/host/?limit=&offset=&sortBy=&order=&hostName=&hostMac=&hostType=&connectedInterfaceName=&hostIp=&connectedNetworkDeviceIpAddress=&subType=&filterOperation=", headers=headers)
+	host = response.json()
+	output = "Peringatan! Terjadi gangguan pada host berikut:\n"
+	output += "Persentase Network Health: " + network_health +"%" "\n"
+	output += "-"*75 +"\n"
+	output += "NO.   NAMA \t  \t Switch \t\t  WAKTU \t STATUS\n"
+	output +="-"*75 +"\n"
+	number=1
+	for device in host['response']:
+		if (device['pingStatus'] == "FAILURE"):
+			output += "" + str(number) +" .  | "+ device['hostName'] +" \t| "+ device['connectedNetworkDeviceName'] +" \t "+ device['lastUpdated'] + " \t "+ device['pingStatus'] + "\n"
+			number +=1
+	return output
+
+def onHTTPDone(status, data, replyHeader): 
+    if status == 200:
+        print("Pesan Network Issues sukses dikirim ke Telegram!")
+    else:
+        print("Pesan Network Issues gagal dikirim ke Telegram!")
+
+def escape_underscore(txt):
+    return txt.replace("_", "-")
+
+if __name__ == "__main__":
+    network_health = get_network_health()
+    if int(network_health) < 100:
+        host_issues = get_host()
+        print(host_issues)
+        http = realhttp.RealHTTPClient()
+   
+        host_issues = escape_underscore(host_issues)
+        send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + host_issues
+        http.get(send_text)
+        
+        http.onDone(onHTTPDone)
+        while True:
+            sleep(5)
+    else:
+        print("Persentase Network Health: "+ network_health +"%")

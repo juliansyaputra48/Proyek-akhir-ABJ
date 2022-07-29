@@ -1,0 +1,239 @@
+-----------------------------------------------
+KONFIGURASI R1
+-----------------------------------------------
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+Router>en
+
+MASUK KE GLOBAL CONFIGURATION
+Router#conf t
+
+Router(config)#hostname RTR_KANTOR
+
+MENGATUR PASSWORD PRIVILEGE MODE
+R1(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+R1(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+R1(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+R1(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+R1(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+R1(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+R1(config-line)#transport input ssh
+R1(config-line)#exit
+R1(config)#
+
+R1(config)#int g0/0/0
+R1(config-if)#description R1 LAN admin
+R1(config-if)#ip address 192.168.45.1 255.255.255.0
+R1(config-if)#no shutdown
+R1(config)#int g0/0/1
+R1(config-if)#description R1 LAN pegawai
+R1(config-if)#ip address 192.168.46.1 255.255.255.0
+R1(config-if)#no shutdown
+
+R1(config-if)#int s0/1/0
+R1(config-if)#description Link to RTR_PABRIK
+R1(config-if)#ip address 172.16.0.1 255.255.255.252
+R1(config-if)#no shutdown
+R1(config-if)#int s0/1/1
+R1(config-if)#description Link to RTR_GUDANG
+R1(config-if)#ip address 172.16.0.9 255.255.255.252
+R1(config-if)#no shutdown
+R1(config-if)#exit
+R1(config)#
+
+
+R1(config)#ip dhcp pool admin
+R1(dhcp-config)#network 192.168.45.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.45.1
+R1(dhcp-config)#dns-server 192.168.45.253
+R1(dhcp-config)#exit
+R1(config)#ip dhcp excluded-address 192.168.45.1 192.168.45.2
+R1(config)#ip dhcp excluded-address 192.168.45.253 192.168.45.254
+R1(config)#
+
+R1(config)#ip dhcp pool pegawai
+R1(dhcp-config)#network 192.168.46.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.46.1
+R1(dhcp-config)#dns-server 192.168.45.253
+R1(dhcp-config)#exit
+R1(config)#ip dhcp excluded-address 192.168.46.1 192.168.46.2
+R1(config)#ip dhcp excluded-address 192.168.46.253
+R1(config)#
+
+R1(config)#router eigrp 48
+R1(config-router)#net 192.168.45.0 
+R1(config-router)#net 192.168.46.0
+R1(config-router)#net 172.16.0.0
+R1(config-router)#net 172.16.0.8 
+
+ctrl+z
+R1#copy run start
+
+-----------------------------------------------
+KONFIGURASI RTR_PABRIK
+-----------------------------------------------
+KONFIGURASI R1
+-----------------------------------------------
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+Router>en
+
+MASUK KE GLOBAL CONFIGURATION
+Router#conf t
+
+Router(config)#hostname RTR_PABRIK
+
+MENGATUR PASSWORD PRIVILEGE MODE
+R1(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+R1(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+R1(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+R1(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+R1(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+R1(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+R1(config-line)#transport input ssh
+R1(config-line)#exit
+R1(config)#
+
+R1(config)#int g0/0/0
+R1(config-if)#description R1 LAN admin
+R1(config-if)#ip address 192.168.47.1 255.255.255.0
+R1(config-if)#no shutdown
+
+R1(config-if)#int s0/1/0
+R1(config-if)#description Link to RTR_PUSAT
+R1(config-if)#ip address 172.16.0.2 255.255.255.252
+R1(config-if)#no shutdown
+R1(config-if)#int s0/2/0
+R1(config-if)#description Link to RTR_GUDANG
+R1(config-if)#ip address 172.16.0.5 255.255.255.252
+R1(config-if)#no shutdown
+R1(config-if)#exit
+R1(config)#
+
+
+R1(config)#ip dhcp pool pabrik
+R1(dhcp-config)#network 192.168.47.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.47.1
+R1(dhcp-config)#dns-server 192.168.45.253
+R1(dhcp-config)#exit
+R1(config)#ip dhcp excluded-address 192.168.45.1 192.168.45.2
+R1(config)#
+
+R1(config)#router eigrp 48
+R1(config-router)#net 192.168.47.0 
+R1(config-router)#net 172.16.0.0
+R1(config-router)#net 172.16.0.4
+ctrl+z
+R1#copy run start
+
+-----------------------------------------------
+KONFIGURASI RTR_GUDANG
+-----------------------------------------------
+BERPINDAH DARI MODE USER KE MODE PRIVILEGE
+Router>en
+
+MASUK KE GLOBAL CONFIGURATION
+Router#conf t
+
+Router(config)#hostname RTR_GUDANG
+
+MENGATUR PASSWORD PRIVILEGE MODE
+R1(config)#enable secret mandiri
+
+MENGATUR NAMA DOMAIN
+R1(config)#ip domain-name usahamandiri.com
+
+MEMBUAT RSA KEY DENGAN MODULUS 1024
+R1(config)#crypto key generate rsa modulus 1024
+
+MEMBUAT AKUN PENGGUNA YANG AKAN MENGAKSES SSH DAN AKAN DISIMPAN LOCAL DATABASE
+R1(config)#username usaha password mandiri
+
+MENGAKTIFKAN SSH PADA LINE  VTY UNTUK 4 PENGGUNA
+R1(config)#line vty 0 3
+
+DAN MENGOTENTIKASI SELURUH SESI MENNGUNAKAN LOCAL USERNAME DATABASE
+R1(config-line)#login local
+
+MENGATUR SSH SBGAI PROTOCOL YANG DAPT DI GUNAKAN SAAT TERKONEKSI MELALUI LINE VTY
+R1(config-line)#transport input ssh
+R1(config-line)#exit
+R1(config)#
+
+
+R3(config)#int g0/0/0
+R3(config-if)#no ip address
+R3(config-if)#no shutdown
+
+R3(config-if)#int g0/0/0.1
+R3(config-subif)#encapsulation dot1Q 1
+R3(config-subif)#ip address 192.168.48.1 255.255.255.248
+R3(config-subif)#exit
+
+R3(config-if)#int g0/0/0.10
+R3(config-subif)#encapsulation dot1Q 10
+R3(config-subif)#ip address 192.168.48.9 255.255.255.248
+R3(config-subif)#exit
+
+R3(config)#int g0/0/0.20
+R3(config-subif)#encapsulation dot1Q 20
+R3(config-subif)#ip address 192.168.48.17 int 255.255.255.248
+R3(config-subif)#exit
+
+R3(config)#int s0/2/0
+R3(config-if)#ip address 172.16.0.6 255.255.255.252
+R3(config-if)#no shutdown
+
+R3(config-if)#int s0/1/1
+R3(config-if)#ip address 172.16.0.10 255.255.255.252
+R3(config-if)#no shutdown
+R3(config-if)#exit
+
+
+R3(config)#ip dhcp pool VLAN 10
+R3(dhcp-config)#network 192.168.48.8 255.255.255.248
+R3(dhcp-config)#default-router 192.168.48.9
+R3(dhcp-config)#dns-server 192.168.45.253
+R3(dhcp-config)#exit
+RTR_GUDANG(config)#ip dhcp excluded-address 192.168.48.9 192.168.48.10
+
+R3(config)#ip dhcp pool VLAN 20
+R3(dhcp-config)#network 192.168.48.16 255.255.255.248
+R3(dhcp-config)#default-router 192.168.48.17
+R3(dhcp-config)#dns-server 192.168.45.253
+R3(dhcp-config)#exit
+RTR_GUDANG(config)#ip dhcp excluded-address 192.168.48.17 192.168.48.18
+
+R1(config)#router eigrp 48
+R1(config-router)#net 192.168.48.0 
+R1(config-router)#net 192.168.48.8
+R1(config-router)#net 192.168.48.16
+R1(config-router)#net 172.16.0.8
+
+
+ctrl+z
+R1#copy run start
+
+
